@@ -30,7 +30,7 @@ def i_see_the_authentication_page(context):
 
 
 @when(u'I enter a random email address')
-def step_impl(context):
+def enter_random_email(context):
     element = context.webdriver.find_element_by_id('email_create')
     unique_id = uuid.uuid4().hex[:7]
     context.email = f'{unique_id}@example.com'
@@ -38,13 +38,13 @@ def step_impl(context):
 
 
 @when(u'I click "Create an account"')
-def step_impl(context):
+def create_an_account(context):
     element = context.webdriver.find_element_by_id('SubmitCreate')
     element.click()
 
 
 @then(u'I see the "Create an account" page')
-def step_impl(context):
+def see_create_account_page(context):
     context.wait.until(expected_conditions.visibility_of_element_located((By.XPATH, "//h1[contains(text(),'Create an account')]")))
 
 
@@ -55,19 +55,19 @@ def i_select_the_mr_button(context):
 
 
 @when(u'I enter "{name}" into the first name field')
-def step_impl(context, name):
+def enter_first_name(context, name):
     element = context.webdriver.find_element_by_id('customer_firstname')
     element.send_keys(name)
 
 
 @when(u'I enter "{name}" into the last name field')
-def step_impl(context, name):
+def enter_last_name(context, name):
     element = context.webdriver.find_element_by_id('customer_lastname')
     element.send_keys(name)
 
 
 @when(u'I enter "{password}" into the password field')
-def step_impl(context, password):
+def enter_password(context, password):
     element = context.webdriver.find_element_by_id('passwd')
     element.send_keys(password)
 
@@ -194,7 +194,7 @@ def i_see_i_am_logged_in(context, name):
 
 
 @given(u'I am logged in as "Peter Pan"')
-def step_impl(context):
+def log_in_as_peter(context):
     context.execute_steps('''
         Given I am on the homepage
           And I am logged out
@@ -208,7 +208,7 @@ def step_impl(context):
 
 
 @when(u'I add the most expensive dress to the cart')
-def step_impl(context):
+def add_most_expensive_dress(context):
     elements = context.webdriver.find_elements_by_class_name('product-container')
     prices = []
     for element in elements:
@@ -237,23 +237,23 @@ def i_visit_the_dresses_page(context):
 
 
 @when(u'I log out')
-def step_impl(context):
+def log_out(context):
     element = context.webdriver.find_element_by_class_name('logout')
     element.click()
     context.wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'login')))
 
 
 @when(u'I log in again as "Peter Pan"')
-def step_impl(context):
+def log_in_again_as_peter(context):
     context.execute_steps('Given I am logged in as "Peter Pan"')
 
 
 @then(u'I can see the most expensive dress is still in the cart')
-def step_impl(context):
+def dress_is_still_in_cart(context):
     context.webdriver.find_element_by_xpath('//*[text()="Cart"]').click()
     context.wait.until(expected_conditions.visibility_of_element_located((By.XPATH, f'//p[contains(text(),"Your shopping cart")]')))
 
-    price = context.hightest_price_dress
+    price = context.hightest_price_dress # Note this is untested as the cart did not seem to persist the choices
     element = context.webdriver.find_element_by_class_name('cart_unit')
     cart_price = element.getAttruibute('innerHTML')
     assert price == cart_price
