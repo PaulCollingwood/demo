@@ -1,5 +1,7 @@
+from operator import itemgetter
 from behave import given, when, then
 from selenium.webdriver.support import expected_conditions
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 import calendar
 import uuid
@@ -169,24 +171,89 @@ def i_am_on_the_account_page(context):
 
 
 @when(u'I enter "{email}" into the signup email field')
-def step_impl(context, email):
+def i_enter_signup_email(context, email):
     element = context.webdriver.find_element_by_id('email')
     element.send_keys(email)
 
 
 @when(u'I enter "{password}" into the signup password field')
-def step_impl(context, password):
+def i_enter_signup_password(context, password):
     element = context.webdriver.find_element_by_id('passwd')
     element.send_keys(password)
 
 
 @when(u'I click the "Sign in" button')
-def step_impl(context):
+def i_click_the_signin_button(context):
     element = context.webdriver.find_element_by_id('SubmitLogin')
     element.click()
 
 
 @then(u'I see I am logged in as "{name}"')
-def step_impl(context, name):
+def i_see_i_am_logged_in(context, name):
     context.wait.until(expected_conditions.visibility_of_element_located((By.XPATH, f'//span[contains(text(),"{name}")]')))
 
+
+@given(u'I am logged in as "Peter Pan"')
+def step_impl(context):
+    context.execute_steps('''
+        Given I am on the homepage
+          And I am logged out
+         When I click "Sign in"
+         Then I see the "Authentication" page
+         When I enter "existing@example.com" into the signup email field
+          And I enter "40958730497856" into the signup password field
+          And I click the "Sign in" button
+         Then I see I am logged in as "Peter Pan"
+    ''')
+
+
+@when(u'I add the most expensive dress to the cart')
+def step_impl(context):
+    elements = context.webdriver.find_elements_by_class_name('product-container')
+    prices = []
+    for element in elements:
+        price = element.find_element_by_class_name('product-price')
+        actual_price = price.get_attribute('innerHTML')
+        actual_price = actual_price.strip().replace('$', '')  # Get rid of the noise and the currency symbol
+        prices.append((actual_price, element))
+
+    prices.sort(key=itemgetter(0))  # Detrmine the highest price dress
+    highest_priced_dress = prices[-1]
+    context.webdriver.execute_script("return arguments[0].scrollIntoView();", highest_priced_dress[1])
+    hover = ActionChains(context.webdriver).move_to_element(highest_priced_dress[1])
+    hover.perform()
+
+    highest_priced_dress[1].find_element_by_class_name('button').click()
+    context.wait.until(expected_conditions.visibility_of_element_located((By.ID, 'layer_cart')))  # Confirm we can now see the cart
+    context.webdriver.find_element_by_class_name('cross').click()  # dismiss the modal
+
+    context.highest_priced_dress_price = highest_priced_dress[0]  # Save it so we can check it later
+
+
+@when(u'I visit the dresses page')
+def i_visit_the_dresses_page(context):
+    context.webdriver.get('http://automationpractice.com/index.php?id_category=8&controller=category')
+    context.wait.until(expected_conditions.visibility_of_element_located((By.XPATH, f'//p[contains(text(),"We offer")]')))
+
+
+@when(u'I log out')
+def step_impl(context):
+    element = context.webdriver.find_element_by_class_name('logout')
+    element.click()
+    context.wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'login')))
+
+
+@when(u'I log in again as "Peter Pan"')
+def step_impl(context):
+    context.execute_steps('Given I am logged in as "Peter Pan"')
+
+
+@then(u'I can see the most expensive dress is still in the cart')
+def step_impl(context):
+    context.webdriver.find_element_by_xpath('//*[text()="Cart"]').click()
+    context.wait.until(expected_conditions.visibility_of_element_located((By.XPATH, f'//p[contains(text(),"Your shopping cart")]')))
+
+    price = context.hightest_price_dress
+    element = context.webdriver.find_element_by_class_name('cart_unit')
+    cart_price = element.getAttruibute('innerHTML')
+    assert price == cart_price

@@ -1,4 +1,4 @@
-Feature: Creating a new account
+Feature: Signing in as an existing user
 
   Scenario:
     Given I am on the homepage
