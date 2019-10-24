@@ -1,8 +1,9 @@
 from behave import given, when, then
 
+
 @given(u'I am on the homepage')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Given I am on the homepage')
+    context.webdriver.get(context.host)
 
 @given(u'I am logged out')
 def step_impl(context):
@@ -99,12 +100,3 @@ def step_impl(context):
 @then(u'I see the My Account page')
 def step_impl(context):
     raise NotImplementedError(u'STEP: Then I see the My Account page')
-
-[0m
-Failing scenarios:
-  features/create_new_account.feature:3  
-
-0 features passed, 1 failed, 0 skipped
-0 scenarios passed, 1 failed, 0 skipped
-0 steps passed, 0 failed, 0 skipped, 25 undefined
-Took 0m0.000s
