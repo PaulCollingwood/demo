@@ -17,6 +17,7 @@ def find_by_xpath(self, xpath):
 def before_all(context):
     context.host = HOST
     context.webdriver = webdriver.Chrome(executable_path='./chromedriver')
+    context.wait = WebDriverWait(context.webdriver, 10)
 
 
 def after_all(context):
