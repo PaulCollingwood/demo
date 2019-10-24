@@ -1,6 +1,6 @@
 Feature: Creating a new account
 
-  Scenario:
+  Scenario: Creating a new account
     Given I am on the homepage
       And I am logged out
      When I click "Sign in"

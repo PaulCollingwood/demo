@@ -1,6 +1,6 @@
 Feature: Signing in as an existing user
 
-  Scenario:
+  Scenario: Log in
     Given I am on the homepage
       And I am logged out
      When I click "Sign in"
