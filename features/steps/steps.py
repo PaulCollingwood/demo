@@ -166,3 +166,27 @@ def i_click_register(context):
 @then(u'I see the My Account page')
 def i_am_on_the_account_page(context):
     context.webdriver.find_element_by_id('my-account')
+
+
+@when(u'I enter "{email}" into the signup email field')
+def step_impl(context, email):
+    element = context.webdriver.find_element_by_id('email')
+    element.send_keys(email)
+
+
+@when(u'I enter "{password}" into the signup password field')
+def step_impl(context, password):
+    element = context.webdriver.find_element_by_id('passwd')
+    element.send_keys(password)
+
+
+@when(u'I click the "Sign in" button')
+def step_impl(context):
+    element = context.webdriver.find_element_by_id('SubmitLogin')
+    element.click()
+
+
+@then(u'I see I am logged in as "{name}"')
+def step_impl(context, name):
+    context.wait.until(expected_conditions.visibility_of_element_located((By.XPATH, f'//span[contains(text(),"{name}")]')))
+
